@@ -3,16 +3,22 @@ const http = require("http");
 const serverConfig = require("./serverConfig").servers;
 
 const roundRobin = require("./roundRobin");
+const leastConnections = require("./leastConnections");
 
 const servers = serverConfig.map((server) => ({
-    ...server
+    ...server,
+    connections: 0
 }));
 
 const loadBalancingAlgorithm = "roundRobin";
+// const loadBalancingAlgorithm = "leastConnections";
 
 const server = http.createServer((req, res) => {
     if(loadBalancingAlgorithm === "roundRobin") {
         roundRobin(servers, req, res);
+    }
+    else if(loadBalancingAlgorithm === "leastConnections") {
+        leastConnections(servers, req, res);
     }
     else {
         res.writeHead(500)
